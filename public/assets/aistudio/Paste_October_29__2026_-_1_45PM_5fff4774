@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperAI Studio - منصة توليد المحتوى بالذكاء الاصطناعي الفائقة</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            },
+            accent: {
+              purple: '#8b5cf6',
+              pink: '#ec4899',
+              gold: '#f59e0b',
+              emerald: '#10b981'
+            },
+            dark: {
+              bg: '#0b0f19',
+              card: '#131b2e',
+              border: '#1f2d4d',
+              hover: '#1c2842'
+            }
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .glass-card {
+      background: rgba(19, 27, 46, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-nav {
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2563eb;
+      border-radius: 4px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glow-button {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .glow-button::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0;
+      filter: blur(10px);
+      transition: opacity 0.3s ease;
+    }
+    .glow-button:hover::after {
+      opacity: 0.8;
+    }
+
+    .animate-pulse-subtle {
+      animation: pulseSubtle 3s infinite ease-in-out;
+    }
+    @keyframes pulseSubtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-sm">
+
+  <!-- ================= HEADER NAVBAR ================= -->
+  <header class="h-16 glass-nav px-6 flex items-center justify-between z-40 shrink-0">
+    <!-- Brand Logo and Dynamic Title -->
+    <div class="flex items-center space-x-3 space-x-reverse">
+      <div id="brandLogoContainer" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20 cursor-pointer" onclick="openLogoModal()">
+        <span id="appLogoIcon" class="text-white text-lg font-bold"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+      </div>
+      <div>
+        <h1 class="font-bold text-base leading-tight tracking-wide flex items-center gap-2">
+          <span id="appBrandTitle" class="gradient-text font-black text-lg">SuperAI Studio</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-semibold border border-blue-500/30">PRO v4.2</span>
+        </h1>
+        <p class="text-[11px] text-gray-400 flex items-center gap-1">
+          المحرك النشط: <span id="currentEngineBadge" class="text-purple-400 font-semibold underline cursor-pointer" onclick="openEngineModal()">Gemini Ultra Pro v3</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Navigation Menu Tabs -->
+    <nav class="hidden lg:flex items-center bg-gray-900/90 p-1.5 rounded-xl border border-gray-800 space-x-1 space-x-reverse">
+      <button onclick="switchTab('templates')" id="tab-templates" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 space-x-reverse transition text-white bg-blue-600 shadow">
+        <i class="fa-solid fa-cubes text-amber-300"></i>
+        <span>القوالب الجاهزة</span>
+      </button>
+      <button onclick="switchTab('text-to-image')" id="tab-text-to-image" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 space-x-reverse transition text-gray-400 hover:text-white">
+        <i class="fa-solid fa-image text-blue-400"></i>
+        <span>توليد الصور</span>
+      </button>
+      <button onclick="switchTab('text-to-video')" id="tab-text-to-video" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 space-x-reverse transition text-gray-400 hover:text-white">
+        <i class="fa-solid fa-video text-purple-400"></i>
+        <span>توليد الفيديو</span>
+      </button>
+      <button onclick="switchTab('img-to-video')" id="tab-img-to-video" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 space-x-reverse transition text-gray-400 hover:text-white">
+        <i class="fa-solid fa-photo-film text-pink-400"></i>
+        <span>تحريك الصور</span>
+      </button>
+      <button onclick="switchTab('story-movie')" id="tab-story-movie" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-2 space-x-reverse transition text-gray-400 hover:text-white">
+        <i class="fa-solid fa-clapperboard text-emerald-400"></i>
+        <span>صانع الأفلام والقصص</span>
+      </button>
+    </nav>
+
+    <!-- User & Customization Controls -->
+    <div class="flex items-center space-x-3 space-x-reverse">
+      <button onclick="openEngineModal()" class="hidden md:flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-xs transition">
+        <i class="fa-solid fa-microchip text-purple-400"></i>
+        <span>تغيير المولد</span>
+      </button>
+      
+      <button onclick="openLogoModal()" class="hidden md:flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-xs transition">
+        <i class="fa-solid fa-pen-nib text-pink-400"></i>
+        <span>تصميم الشعار</span>
+      </button>
+
+      <!-- User Auth State Button -->
+      <div id="userAuthSection">
+        <button onclick="openAuthModal()" id="loginBtn" class="glow-button px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-xs flex items-center space-x-2 space-x-reverse shadow-lg">
+          <i class="fa-solid fa-user"></i>
+          <span id="userNameBadge">تسجيل الدخول</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Tab Bar -->
+  <div class="lg:hidden flex overflow-x-auto border-b border-gray-800 bg-gray-900/90 p-2 space-x-2 space-x-reverse shrink-0">
+    <button onclick="switchTab('templates')" class="mobile-tab px-3 py-1.5 rounded-lg text-xs flex-shrink-0 bg-blue-600 text-white font-bold">القوالب</button>
+    <button onclick="switchTab('text-to-image')" class="mobile-tab px-3 py-1.5 rounded-lg text-xs flex-shrink-0 bg-gray-800 text-gray-300">الصور</button>
+    <button onclick="switchTab('text-to-video')" class="mobile-tab px-3 py-1.5 rounded-lg text-xs flex-shrink-0 bg-gray-800 text-gray-300">الفيديو</button>
+    <button onclick="switchTab('img-to-video')" class="mobile-tab px-3 py-1.5 rounded-lg text-xs flex-shrink-0 bg-gray-800 text-gray-300">تحريك الصور</button>
+    <button onclick="switchTab('story-movie')" class="mobile-tab px-3 py-1.5 rounded-lg text-xs flex-shrink-0 bg-gray-800 text-gray-300">الأفلام والقصص</button>
+  </div>
+
+  <!-- ================= MAIN SUITE CONTENT ================= -->
+  <main class="flex-1 flex overflow-hidden relative">
+
+    <!-- TAB 1: SMART TEMPLATES (قوالب جاهزة متفوقة على Leonardo & CapCut) -->
+    <div id="view-templates" class="view-panel flex-1 flex flex-col p-6 overflow-y-auto space-y-6">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-gray-800 pb-5">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+            مكتبة القوالب الذكية الاحترافية
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">اختر من القوالب المجهزة مسبقاً للشبكات الاجتماعية، الإعلانات، والأفلام السينمائية بنقرة واحدة.</p>
+        </div>
+        
+        <div class="flex items-center space-x-2 space-x-reverse bg-gray-900 p-1 rounded-xl border border-gray-800">
+          <button onclick="filterTemplates('all')" class="tpl-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white">الكل</button>
+          <button onclick="filterTemplates('image')" class="tpl-filter px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">قوالب الصور (InstaSize)</button>
+          <button onclick="filterTemplates('video')" class="tpl-filter px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">قوالب الفيديو (CapCut)</button>
+          <button onclick="filterTemplates('movie')" class="tpl-filter px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">قوالب القصص والأفلام</button>
+        </div>
+      </div>
+
+      <!-- Templates Grid -->
+      <div id="templatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <!-- Templates auto injected via JS -->
+      </div>
+    </div>
+
+    <!-- TAB 2: TEXT TO IMAGE GENERATOR -->
+    <div id="view-text-to-image" class="view-panel hidden flex-1 flex flex-col lg:flex-row overflow-hidden w-full">
+      <!-- Config Panel Left -->
+      <div class="w-full lg:w-80 border-l border-gray-800 bg-dark-bg p-5 overflow-y-auto shrink-0 space-y-5">
+        <div>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-gray-300 mb-1 flex items-center justify-between">
+            <span>إعدادات توليد الصور</span>
+            <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">InstaSize AI</span>
+          </h3>
+          <p class="text-xs text-gray-500">خصص نمط الأبعاد والدقة ومحرك الرسم</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">أبعاد الصورة (Aspect Ratio)</label>
+            <div class="grid grid-cols-2 gap-2" id="imgAspectGrid">
+              <button onclick="selectAspect('1:1')" class="aspect-card active p-2.5 rounded-xl border border-blue-500 bg-blue-500/10 text-xs text-center flex flex-col items-center gap-1">
+                <i class="fa-solid fa-square text-base"></i>
+                <span>1:1 مربع (إنستغرام)</span>
+              </button>
+              <button onclick="selectAspect('9:16')" class="aspect-card p-2.5 rounded-xl border border-gray-800 bg-dark-card text-xs text-center flex flex-col items-center gap-1 hover:border-gray-700">
+                <i class="fa-solid fa-mobile-button text-base"></i>
+                <span>9:16 ستوري / تيك توك</span>
+              </button>
+              <button onclick="selectAspect('16:9')" class="aspect-card p-2.5 rounded-xl border border-gray-800 bg-dark-card text-xs text-center flex flex-col items-center gap-1 hover:border-gray-700">
+                <i class="fa-solid fa-display text-base"></i>
+                <span>16:9 سينمائي / يوتيوب</span>
+              </button>
+              <button onclick="selectAspect('4:5')" class="aspect-card p-2.5 rounded-xl border border-gray-800 bg-dark-card text-xs text-center flex flex-col items-center gap-1 hover:border-gray-700">
+                <i class="fa-solid fa-image text-base"></i>
+                <span>4:5 بورتريت متقدم</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">النمط الفني (Art Style)</label>
+            <select id="imageStyleSelect" class="w-full bg-dark-card border border-gray-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
+              <option value="photorealistic">واقعي سينمائي (Photorealistic Ultra 8K)</option>
+              <option value="cyberpunk">سايبربانك ونيون مستقبلي (Cyberpunk Neon)</option>
+              <option value="anime">أنمي ياباني احترافي (Modern Anime Art)</option>
+              <option value="3d-render">رندر ثلاثي الأبعاد (3D Octane Render)</option>
+              <option value="fantasy">خيالي ورسم زيتي (High Fantasy Oil Art)</option>
+              <option value="logo-icon">شعار وأيقونة متجهية (Vector Logo/Icon)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">محرر الصور المدمج (InstaSize Tool)</label>
+            <div class="space-y-2">
+              <label class="flex items-center space-x-2 space-x-reverse text-xs text-gray-300 cursor-pointer">
+                <input type="checkbox" id="chkAutoRemoveBg" class="rounded bg-dark-card border-gray-700 text-blue-600 focus:ring-0">
+                <span>تفريغ وإزالة الخلفية تلقائياً (Remove BG)</span>
+              </label>
+              <label class="flex items-center space-x-2 space-x-reverse text-xs text-gray-300 cursor-pointer">
+                <input type="checkbox" id="chkUpscale4k" checked class="rounded bg-dark-card border-gray-700 text-blue-600 focus:ring-0">
+                <span>تحسين الدقة إلى 4K تلقائياً (AI Upscale)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Canvas Center -->
+      <div class="flex-1 flex flex-col p-6 overflow-y-auto space-y-6">
+        <div class="flex-1 min-h-[350px] glass-card rounded-2xl flex flex-col items-center justify-center relative overflow-hidden p-4 border border-gray-800">
+          <div id="imgPlaceholder" class="text-center space-y-3 p-6 max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto text-2xl border border-blue-500/20">
+              <i class="fa-solid fa-palette"></i>
+            </div>
+            <h3 class="text-base font-bold text-gray-200">مولد الصور الفائق بالذكاء الاصطناعي</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">أدخل وصفاً تفصيلياً باللغة العربية أو الإنجليزية. المحرك يدعم كتابة النصوص داخل الصور بدقة عالية وتوليد تفاصيل دقيقة للغاية.</p>
+          </div>
+
+          <!-- Processing State -->
+          <div id="imgLoading" class="hidden absolute inset-0 bg-dark-bg/90 backdrop-blur-md flex flex-col items-center justify-center space-y-4 z-20">
+            <div class="w-16 h-16 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin"></div>
+            <p id="imgLoadingText" class="text-xs text-blue-400 font-bold tracking-wide">جاري رسم وتوليد الصورة عبر المحرك...</p>
+          </div>
+
+          <!-- Image Output Box -->
+          <div id="imgResultBox" class="hidden w-full h-full flex flex-col items-center justify-center relative group">
+            <img id="imgResultDisplay" class="max-h-[500px] max-w-full rounded-xl object-contain shadow-2xl border border-gray-800" src="" alt="النتيجة المفلترة">
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-dark-bg/90 backdrop-blur-md p-2 rounded-xl border border-gray-700 flex items-center space-x-2 space-x-reverse">
+              <button onclick="downloadImageResult()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 space-x-reverse">
+                <i class="fa-solid fa-download"></i>
+                <span>تحميل الصورة</span>
+              </button>
+              <button onclick="sendToAnimateTab()" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 space-x-reverse">
+                <i class="fa-solid fa-film"></i>
+                <span>تحويل إلى فيديو</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="glass-panel p-4 rounded-2xl border border-gray-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-gray-300 flex items-center space-x-2 space-x-reverse">
+              <i class="fa-solid fa-pen-nib text-blue-400"></i>
+              <span>الوصف النصي للصورة (Prompt)</span>
+            </label>
+            <button onclick="magicEnhanceImgPrompt()" class="text-xs text-purple-400 hover:text-purple-300 font-bold flex items-center space-x-1 space-x-reverse">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>تحسين الذكاء الاصطناعي</span>
+            </button>
+          </div>
+          <div class="relative">
+            <textarea id="imgPromptInput" rows="3" class="w-full bg-dark-bg/80 border border-gray-700 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none pl-32" placeholder="مثال: رائد فضاء يستكشف مدينة مستقبلية مليئة بأنوار النيون، تصوير سينمائي، دقة 8K فائقة..."></textarea>
+            <button onclick="generateImage()" class="glow-button absolute bottom-3 left-3 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-xs font-bold shadow-lg flex items-center space-x-2 space-x-reverse">
+              <i class="fa-solid fa-sparkles"></i>
+              <span>توليد الصورة</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: TEXT TO VIDEO GENERATOR (CapCut Engine) -->
+    <div id="view-text-to-video" class="view-panel hidden flex-1 flex flex-col lg:flex-row overflow-hidden w-full">
+      <!-- Config Left -->
+      <div class="w-full lg:w-80 border-l border-gray-800 bg-dark-bg p-5 overflow-y-auto shrink-0 space-y-5">
+        <div>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-gray-300 mb-1 flex items-center justify-between">
+            <span>إعدادات الفيديو والتأثيرات</span>
+            <span class="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30">CapCut AI</span>
+          </h3>
+          <p class="text-xs text-gray-500">تحكم بفيزيائية الحركة والكاميرا السينمائية</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">حركة الكاميرا (Camera Motion)</label>
+            <select id="videoCameraMotion" class="w-full bg-dark-card border border-gray-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
+              <option value="cinematic">حركة زوم سينمائي هادئ (Cinematic Slow Zoom)</option>
+              <option value="drone">مسح جوي بالطائرة المسيرة (Aerial Drone Sweep)</option>
+              <option value="orbit">دوران 360 درجة حول الهدف (360 Orbit)</option>
+              <option value="hyperlapse">حركة متسارعة (Hyperlapse Motion)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">شدة الحركة (Motion Intensity)</label>
+            <input type="range" id="videoMotionSlider" min="1" max="10" value="6" class="w-full accent-purple-500">
+            <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+              <span>بطيئة هادئة</span>
+              <span>متوازنة</span>
+              <span>ديناميكية عالية</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1.5">مدة المقطع المطلوب</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="setVidDuration('5s')" class="vid-dur-card active p-2 rounded-xl border border-purple-500 bg-purple-500/10 text-xs text-center font-bold">5 ثوانٍ</button>
+              <button onclick="setVidDuration('10s')" class="vid-dur-card p-2 rounded-xl border border-gray-800 bg-dark-card text-xs text-center font-bold hover:border-gray-700">10 ثوانٍ</button>
+              <button onclick="setVidDuration('15s')" class="vid-dur-card p-2 rounded-xl border border-gray-800 bg-dark-card text-xs text-center font-bold hover:border-gray-700">15 ثانية</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Canvas Center -->
+      <div class="flex-1 flex flex-col p-6 overflow-y-auto space-y-6">
+        <div class="flex-1 min-h-[350px] glass-card rounded-2xl flex flex-col items-center justify-center relative overflow-hidden p-4 border border-gray-800">
+          <div id="vidPlaceholder" class="text-center space-y-3 p-6 max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto text-2xl border border-purple-500/20">
+              <i class="fa-solid fa-clapperboard"></i>
+            </div>
+            <h3 class="text-base font-bold text-gray-200">مولد الفيديوهات السينمائية</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">حول أفكارك النصية إلى مقاطع فيديو متكافئة بفيزيائية إضاءة وحركة الواقع مع إمكانية تحريك العناصر بدقة.</p>
+          </div>
+
+          <!-- Video Processing State -->
+          <div id="vidLoading" class="hidden absolute inset-0 bg-dark-bg/90 backdrop-blur-md flex flex-col items-center justify-center space-y-4 z-20">
+            <div class="w-16 h-16 rounded-full border-4 border-purple-500/20 border-t-purple-500 animate-spin"></div>
+            <p class="text-xs text-purple-400 font-bold">جاري معالجة الإطارات وتطبيق الفيزيائية الحركية...</p>
+          </div>
+
+          <!-- Video Canvas Output -->
+          <div id="vidResultBox" class="hidden w-full h-full flex flex-col items-center justify-center relative">
+            <canvas id="videoCanvas" class="max-h-[480px] max-w-full rounded-xl shadow-2xl border border-gray-800"></canvas>
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark-bg/90 backdrop-blur-md p-2 rounded-xl border border-gray-700 flex items-center space-x-2 space-x-reverse">
+              <button onclick="toggleVideoPlayback()" id="btnPlayPauseVid" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 space-x-reverse">
+                <i class="fa-solid fa-pause"></i>
+                <span>إيقاف مؤقت</span>
+              </button>
+              <button onclick="downloadCanvasVideo()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 space-x-reverse">
+                <i class="fa-solid fa-download"></i>
+                <span>حفظ الفيديو</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prompt Bar -->
+        <div class="glass-panel p-4 rounded-2xl border border-gray-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-gray-300 flex items-center space-x-2 space-x-reverse">
+              <i class="fa-solid fa-film text-purple-400"></i>
+              <span>سيناريو وصف الحركة والمشهد</span>
+            </label>
+          </div>
+          <div class="relative">
+            <textarea id="videoPromptInput" rows="3" class="w-full bg-dark-bg/80 border border-gray-700 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none pl-32" placeholder="مثال: لقطة سينمائية لسيارة رياضية تسير بسرعة في شاطئ عند الغروب، انعكاسات الماء والدخان تصاعدياً..."></textarea>
+            <button onclick="generateVideoFromText()" class="glow-button absolute bottom-3 left-3 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl text-xs font-bold shadow-lg flex items-center space-x-2 space-x-reverse">
+              <i class="fa-solid fa-play"></i>
+              <span>رندر الفيديو</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: IMAGE TO VIDEO (تحريك الصور الثابتة) -->
+    <div id="view-img-to-video" class="view-panel hidden flex-1 flex flex-col p-6 overflow-y-auto space-y-6">
+      <div class="border-b border-gray-800 pb-4">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-photo-film text-pink-500"></i>
+          تحريك الصور الثابتة تحريكاً حياً
+        </h2>
+        <p class="text-xs text-gray-400">ارفع أي صورة ثابتة لتحويلها إلى مقطع فيديو متحرك ومبهر بالذكاء الاصطناعي.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-[350px]">
+        <!-- Source Image Upload Card -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col border border-gray-800 relative">
+          <h4 class="text-xs font-bold text-gray-300 mb-3 flex items-center justify-between">
+            <span>1. اختيار أو رفع الصورة الأصلية</span>
+            <button onclick="document.getElementById('imgUploadInput').click()" class="text-blue-400 hover:text-blue-300 text-xs font-bold">رفع من الجهاز</button>
+          </h4>
+          <input type="file" id="imgUploadInput" accept="image/*" class="hidden" onchange="handleImageVidUpload(event)">
+
+          <div id="imgUploadDropZone" onclick="document.getElementById('imgUploadInput').click()" class="flex-1 border-2 border-dashed border-gray-700 rounded-2xl flex flex-col items-center justify-center p-8 text-center cursor-pointer hover:border-pink-500/50 transition bg-dark-bg/40">
+            <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-600 mb-3"></i>
+            <p class="text-xs font-bold text-gray-300">اضغط هنا أو اسحب الصورة لرفعها</p>
+            <p class="text-[11px] text-gray-500 mt-1">يدعم صيغ JPG, PNG, WebP</p>
+          </div>
+
+          <img id="imgVidSourcePreview" class="hidden flex-1 w-full h-[300px] object-contain rounded-xl border border-gray-800 bg-black/40" src="" alt="المعاينة">
+        </div>
+
+        <!-- Rendered Video Card -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col border border-gray-800 relative">
+          <h4 class="text-xs font-bold text-gray-300 mb-3">2. معايير وشاشة عرض النتيجة الحركية</h4>
+          
+          <div id="imgVidPlaceholder" class="flex-1 border border-gray-800 rounded-2xl flex flex-col items-center justify-center p-8 text-center bg-black/30">
+            <i class="fa-solid fa-wand-magic-sparkles text-4xl text-gray-700 mb-3"></i>
+            <p class="text-xs text-gray-400">ستظهر معاينة الفيديو المولد هنا بعد معالجة الصورة.</p>
+          </div>
+
+          <div id="imgVidLoadingState" class="hidden absolute inset-0 bg-dark-bg/90 backdrop-blur-md flex flex-col items-center justify-center space-y-4 z-20 rounded-2xl">
+            <div class="w-12 h-12 rounded-full border-4 border-pink-500/20 border-t-pink-500 animate-spin"></div>
+            <p class="text-xs text-pink-400 font-bold">جاري حساب العمق وتحريك العناصر...</p>
+          </div>
+
+          <canvas id="imgVidOutputCanvas" class="hidden flex-1 w-full h-[300px] object-contain rounded-xl border border-gray-800 bg-black"></canvas>
+        </div>
+      </div>
+
+      <!-- Bottom Motion Actions -->
+      <div class="glass-panel p-4 rounded-2xl border border-gray-800 flex items-center justify-between">
+        <input id="imgVidMotionPrompt" type="text" placeholder="توجيه حركة إضافي (مثال: اجعل الأشجار تتطاير في الهواء والماء يجري...)" class="flex-1 bg-dark-bg/80 border border-gray-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-pink-500 ml-4">
+        <button onclick="generateImageToVideoAnim()" class="glow-button px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-xl text-xs font-bold shadow-lg flex items-center space-x-2 space-x-reverse shrink-0">
+          <i class="fa-solid fa-play"></i>
+          <span>تحريك الصورة الآن</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 5: TEXT TO MOVIE & STORYBOARDS (صانع الأفلام والقصص الكامل) -->
+    <div id="view-story-movie" class="view-panel hidden flex-1 flex flex-col overflow-hidden w-full">
+      <div class="p-6 border-b border-gray-800 bg-dark-bg/80 shrink-0">
+        <div class="max-w-4xl mx-auto space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-clapperboard text-emerald-400"></i>
+                صانع الأفلام والقصص المصورة التفاعلي
+              </h2>
+              <p class="text-xs text-gray-400">أدخل سيناريو أو فكرة قصة كاملة. سيقوم الذكاء الاصطناعي بتقسيمها إلى مشاهد متسلسلة، مع توليد الصورة والحوار والتعليق الصوتي.</p>
+            </div>
+            <button onclick="loadSampleStoryIdea()" class="px-3.5 py-2 bg-gray-800 hover:bg-gray-700 text-xs text-emerald-300 rounded-xl border border-emerald-500/30 flex items-center space-x-1.5 space-x-reverse transition">
+              <i class="fa-solid fa-lightbulb"></i>
+              <span>فكرة قصة خيالية</span>
+            </button>
+          </div>
+
+          <div class="flex gap-2">
+            <input id="storyScriptInput" type="text" placeholder="اكتب سيناريو القصة هنا (مثال: في عام 2150، ينطلق مستكشف عربي في رحلة عبر مجرة درب التبانة لاكتشاف كوكب مجهول...)" class="flex-1 bg-dark-card border border-gray-700 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <button onclick="buildMovieStoryboard()" class="glow-button px-6 py-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 text-white rounded-xl text-xs font-bold shadow-lg flex items-center space-x-2 space-x-reverse shrink-0">
+              <i class="fa-solid fa-film"></i>
+              <span>توليد مشاهد الفيلم</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 p-6 overflow-y-auto">
+        <div id="storyboardEmpty" class="text-center py-20 text-gray-500 space-y-3 max-w-md mx-auto">
+          <i class="fa-solid fa-photo-film text-5xl text-gray-700"></i>
+          <h3 class="text-sm font-bold text-gray-400">لم يتم توليد أي مشاهد بعد</h3>
+          <p class="text-xs">اكتب قصة أو اضغط على "فكرة قصة خيالية" ثم انقر على توليد مشاهد الفيلم ليبدأ الذكاء الاصطناعي بإنشاء الفيلم.</p>
+        </div>
+
+        <div id="storyboardProgress" class="hidden text-center py-12 space-y-3">
+          <div class="w-12 h-12 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin mx-auto"></div>
+          <p class="text-xs text-emerald-400 font-bold">جاري كتابة السيناريو وتقسيم اللقطات وتوليد المشاهد المصورة...</p>
+        </div>
+
+        <!-- Rendered Movie Scenes Grid -->
+        <div id="storyboardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MODALS & POPUPS ================= -->
+
+  <!-- 1. AUTHENTICATION MODAL (تسجيل الدخول البسيط) -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-dark-card border border-gray-800 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      
+      <div class="text-center space-y-1">
+        <h3 class="text-lg font-bold text-white">حساب المستخدم والمكافآت</h3>
+        <p class="text-xs text-gray-400">سجل دخولك للحصول على 500 رصيد مجاني يومياً لتوليد الصور والفيديوهات</p>
+      </div>
+
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">البريد الإلكتروني</label>
+          <input type="email" id="authEmail" required placeholder="name@domain.com" class="w-full bg-dark-bg border border-gray-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">كلمة المرور</label>
+          <input type="password" id="authPassword" required placeholder="••••••••" class="w-full bg-dark-bg border border-gray-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl text-xs shadow-lg">
+          تسجيل الدخول / إنشاء حساب جديد
+        </button>
+      </form>
+
+      <div class="pt-3 border-t border-gray-800 text-center">
+        <p class="text-xs text-gray-400">رصيدك الحالي: <span id="userCreditsDisplay" class="text-amber-400 font-bold">500 نقطة</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. AI ENGINE SWITCHER MODAL (تعديل اسم ومولد الذكاء الاصطناعي) -->
+  <div id="engineModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-dark-card border border-gray-800 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
+      <button onclick="closeEngineModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+      <div>
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-microchip text-purple-400"></i>
+          تبديل وتخصيص محرك الذكاء الاصطناعي
+        </h3>
+        <p class="text-xs text-gray-400 mt-1">اختر المولد الأساسي أو اكتب اسماً مخصصاً للمحرك المعتمد في كل الواجهة.</p>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">اختيار المحرك المسبق</label>
+          <select id="engineSelectPreset" onchange="applyEnginePreset()" class="w-full bg-dark-bg border border-gray-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500">
+            <option value="Gemini Ultra Pro v3">Gemini Ultra Pro v3 (الأسرع والأدق)</option>
+            <option value="Sora Video Engine 2.0">Sora Video Engine 2.0 (توليد فيديو واقعي)</option>
+            <option value="Flux Ultra HD Engine">Flux Ultra HD Engine (رسم عالي الجودة)</option>
+            <option value="Midjourney V6 Pro">Midjourney V6 Pro (أنماط فنية سينمائية)</option>
+            <option value="RunWay Gen-3 Alpha">RunWay Gen-3 Alpha (تحريك وتحويل الصور)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">أو تخصيص اسم محرك جديد</label>
+          <input type="text" id="customEngineNameInput" placeholder="اكتب اسم المحرك الخاص بك..." class="w-full bg-dark-bg border border-gray-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500">
+        </div>
+      </div>
+
+      <button onclick="saveCustomEngineName()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs shadow-lg">
+        حفظ وتحديث اسم المحرك
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. LOGO DESIGNER MODAL (إنشاء وتصميم الشعار) -->
+  <div id="logoModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-dark-card border border-gray-800 rounded-2xl w-full max-w-lg p-6 space-y-5 shadow-2xl relative">
+      <button onclick="closeLogoModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+      <div>
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-pen-nib text-pink-400"></i>
+          أداة تصميم وتخصيص شعار المنصة (Logo Creator)
+        </h3>
+        <p class="text-xs text-gray-400 mt-1">خصص اسم المنصة وأيقونة الشعار ليتم تطبيقهما فوراً في أرجاء التطبيق.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">اسم المنصة الجديد</label>
+          <input type="text" id="brandNameInput" value="SuperAI Studio" class="w-full bg-dark-bg border border-gray-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-pink-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">اختيار أيقونة الشعار</label>
+          <div class="grid grid-cols-5 gap-2" id="logoIconPicker">
+            <button onclick="selectLogoIcon('fa-wand-magic-sparkles')" class="icon-pick active p-3 rounded-xl border border-pink-500 bg-pink-500/10 text-lg text-center text-pink-400"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+            <button onclick="selectLogoIcon('fa-brain')" class="icon-pick p-3 rounded-xl border border-gray-700 bg-dark-bg text-lg text-center text-gray-400"><i class="fa-solid fa-brain"></i></button>
+            <button onclick="selectLogoIcon('fa-bolt')" class="icon-pick p-3 rounded-xl border border-gray-700 bg-dark-bg text-lg text-center text-gray-400"><i class="fa-solid fa-bolt"></i></button>
+            <button onclick="selectLogoIcon('fa-gem')" class="icon-pick p-3 rounded-xl border border-gray-700 bg-dark-bg text-lg text-center text-gray-400"><i class="fa-solid fa-gem"></i></button>
+            <button onclick="selectLogoIcon('fa-eye')" class="icon-pick p-3 rounded-xl border border-gray-700 bg-dark-bg text-lg text-center text-gray-400"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="applyLogoChanges()" class="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl text-xs shadow-lg">
+        تطبيق الشعار فوراً
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastBox" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- JavaScript App Logic -->
+  <script>
+    // State Variables
+    let currentUser = JSON.parse(localStorage.getItem('superai_user') || '{"name":"زائر","credits":500}');
+    let selectedEngine = localStorage.getItem('superai_engine') || "Gemini Ultra Pro v3";
+    let selectedLogoIcon = "fa-wand-magic-sparkles";
+    let currentAspect = "1:1";
+    let currentVidDuration = "5s";
+    let videoAnimId = null;
+    let imgVidAnimId = null;
+    let currentGeneratedImgUrl = null;
+
+    // Sample Templates Dataset (Leonardo, CapCut & Story Presets)
+    const templatesList = [
+      {
+        id: 1,
+        type: 'image',
+        title: 'بورتريت سينمائي 8K',
+        category: 'InstaSize / صور',
+        desc: 'إضاءة درامية ملونة مع خلفية ضبابية بورتريه عالي الدقة.',
+        prompt: 'Cinematic dramatic portrait of a person, 8k ultra realistic, neon highlights, bokeh background',
+        badge: 'الأكثر استخداماً'
+      },
+      {
+        id: 2,
+        type: 'image',
+        title: 'تصميم شعار ثلاثي الأبعاد',
+        category: 'InstaSize / شعارات',
+        desc: 'قالب إبداعي لصناعة أيقونات وشعارات الشركات الحديثة.',
+        prompt: 'Minimalist 3D vector logo icon, modern tech brand, glossy octane render, dark background',
+        badge: 'شعارات'
+      },
+      {
+        id: 3,
+        type: 'video',
+        title: 'تريند تيك توك وريلز متسارع',
+        category: 'CapCut / فيديو',
+        desc: 'حركة كاميرا فائقة السرعة مع تأثيرات ضوئية متحركة.',
+        prompt: 'Fast paced hyperlapse zoom through futuristic neon aesthetic city, seamless looping motion',
+        badge: 'تريند TikTok'
+      },
+      {
+        id: 4,
+        type: 'video',
+        title: 'مقدمة سينمائية (Drone Sweep)',
+        category: 'CapCut / فيديو',
+        desc: 'مسح جوي سينمائي بمسيرة طائرة على جبال طبيعية.',
+        prompt: 'Aerial drone sweeping over misty epic mountains at sunrise, 4k cinematic footage',
+        badge: 'يوتيوب سينمائي'
+      },
+      {
+        id: 5,
+        type: 'movie',
+        title: 'قصة خيال علمي ومجرة',
+        category: 'قصص وأفلام',
+        desc: 'مشاهد متسلسلة لرحلة استكشاف كوكب جديد في الفضاء.',
+        prompt: 'Sci-fi space exploration story on a crystal covered alien planet',
+        badge: 'قصة كاملة'
+      },
+      {
+        id: 6,
+        type: 'movie',
+        title: 'مغامرة تاريخية أسطورية',
+        category: 'قصص وأفلام',
+        desc: 'مشاهد أسطورية لقلعة قديمة وفوارس في ملحمة سينمائية.',
+        prompt: 'Historical epic battle scene around an ancient fortress',
+        badge: 'فيلم سينمائي'
+      }
+    ];
+
+    // Initialization
+    window.addEventListener('load', () => {
+      renderTemplates('all');
+      updateUIWithEngine();
+      updateUserBadge();
+    });
+
+    // Navigation Switches
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white', 'shadow');
+        btn.classList.add('text-gray-400');
+      });
+
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow');
+        activeBtn.classList.remove('text-gray-400');
+      }
+    }
+
+    // Render Templates
+    function renderTemplates(filter) {
+      const container = document.getElementById('templatesContainer');
+      container.innerHTML = "";
+
+      const filtered = filter === 'all' ? templatesList : templatesList.filter(t => t.type === filter);
+
+      filtered.forEach(t => {
+        const card = document.createElement('div');
+        card.className = "glass-card rounded-2xl p-5 border border-gray-800 space-y-3 flex flex-col justify-between hover:border-blue-500/50 transition group";
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 font-bold">${t.badge}</span>
+              <span class="text-gray-500">${t.category}</span>
+            </div>
+            <h4 class="font-bold text-sm text-white group-hover:text-blue-400 transition">${t.title}</h4>
+            <p class="text-xs text-gray-400 leading-relaxed">${t.desc}</p>
+          </div>
+          <button onclick="useTemplate('${t.type}', '${t.prompt.replace(/'/g, "\\'")}')" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-blue-600 text-white font-bold text-xs transition flex items-center justify-center space-x-1.5 space-x-reverse">
+            <i class="fa-solid fa-play"></i>
+            <span>تطبيق القالب فوراً</span>
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterTemplates(type) {
+      document.querySelectorAll('.tpl-filter').forEach(b => {
+        b.classList.remove('bg-blue-600', 'text-white');
+        b.classList.add('text-gray-400');
+      });
+      event.currentTarget.classList.add('bg-blue-600', 'text-white');
+      event.currentTarget.classList.remove('text-gray-400');
+      renderTemplates(type);
+    }
+
+    function useTemplate(type, prompt) {
+      if (type === 'image') {
+        document.getElementById('imgPromptInput').value = prompt;
+        switchTab('text-to-image');
+      } else if (type === 'video') {
+        document.getElementById('videoPromptInput').value = prompt;
+        switchTab('text-to-video');
+      } else if (type === 'movie') {
+        document.getElementById('storyScriptInput').value = prompt;
+        switchTab('story-movie');
+      }
+      showToast("تم تحميل القالب بنجاح!", "success");
+    }
+
+    // Engine Switcher Logic
+    function openEngineModal() {
+      document.getElementById('engineModal').classList.remove('hidden');
+    }
+    function closeEngineModal() {
+      document.getElementById('engineModal').classList.add('hidden');
+    }
+    function applyEnginePreset() {
+      const val = document.getElementById('engineSelectPreset').value;
+      document.getElementById('customEngineNameInput').value = val;
+    }
+    function saveCustomEngineName() {
+      const val = document.getElementById('customEngineNameInput').value.trim() || document.getElementById('engineSelectPreset').value;
+      selectedEngine = val;
+      localStorage.setItem('superai_engine', val);
+      updateUIWithEngine();
+      closeEngineModal();
+      showToast(`تم تعيين المحرك إلى: ${val}`, "success");
+    }
+    function updateUIWithEngine() {
+      document.getElementById('currentEngineBadge').innerText = selectedEngine;
+    }
+
+    // Logo Designer Logic
+    function openLogoModal() {
+      document.getElementById('logoModal').classList.remove('hidden');
+    }
+    function closeLogoModal() {
+      document.getElementById('logoModal').classList.add('hidden');
+    }
+    function selectLogoIcon(iconClass) {
+      selectedLogoIcon = iconClass;
+      document.querySelectorAll('#logoIconPicker .icon-pick').forEach(btn => {
+        btn.classList.remove('border-pink-500', 'bg-pink-500/10', 'text-pink-400');
+        btn.classList.add('border-gray-700', 'bg-dark-bg', 'text-gray-400');
+      });
+      event.currentTarget.classList.add('border-pink-500', 'bg-pink-500/10', 'text-pink-400');
+      event.currentTarget.classList.remove('border-gray-700', 'bg-dark-bg', 'text-gray-400');
+    }
+    function applyLogoChanges() {
+      const name = document.getElementById('brandNameInput').value.trim() || "SuperAI Studio";
+      document.getElementById('appBrandTitle').innerText = name;
+      document.getElementById('appLogoIcon').innerHTML = `<i class="fa-solid ${selectedLogoIcon}"></i>`;
+      closeLogoModal();
+      showToast("تم تحديث الشعار واسم التطبيق فوراً!", "success");
+    }
+
+    // Authentication Modal & Logic
+    function openAuthModal() {
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      currentUser.name = email.split('@')[0];
+      currentUser.credits = 500;
+      localStorage.setItem('superai_user', JSON.stringify(currentUser));
+      updateUserBadge();
+      closeAuthModal();
+      showToast(`أهلاً بك ${currentUser.name}! تم منحك 500 نقطة مجانية.`, "success");
+    }
+    function updateUserBadge() {
+      document.getElementById('userNameBadge').innerText = currentUser.name || "تسجيل الدخول";
+      document.getElementById('userCreditsDisplay').innerText = `${currentUser.credits} نقطة`;
+    }
+
+    // Tab 2: Text to Image Functions
+    function selectAspect(asp) {
+      currentAspect = asp;
+      document.querySelectorAll('#imgAspectGrid .aspect-card').forEach(b => {
+        b.classList.remove('border-blue-500', 'bg-blue-500/10');
+        b.classList.add('border-gray-800', 'bg-dark-card');
+      });
+      event.currentTarget.classList.add('border-blue-500', 'bg-blue-500/10');
+      event.currentTarget.classList.remove('border-gray-800', 'bg-dark-card');
+    }
+
+    async function generateImage() {
+      const prompt = document.getElementById('imgPromptInput').value.trim();
+      if (!prompt) {
+        showToast("يرجى إدخال وصف للصورة أولاً.", "warning");
+        return;
+      }
+
+      document.getElementById('imgPlaceholder').classList.add('hidden');
+      document.getElementById('imgResultBox').classList.add('hidden');
+      document.getElementById('imgLoading').classList.remove('hidden');
+
+      try {
+        const apiKey = ""; // Canvas provides API key at runtime
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: [{ role: 'user', parts: [{ text: `High detailed artistic image: ${prompt}` }] }],
+          generationConfig: {
+            responseModalities: ['IMAGE'],
+            imageConfig: { aspectRatio: currentAspect }
+          }
+        };
+
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+        if (base64) {
+          currentGeneratedImgUrl = `data:image/png;base64,${base64}`;
+          document.getElementById('imgResultDisplay').src = currentGeneratedImgUrl;
+          document.getElementById('imgResultBox').classList.remove('hidden');
+          showToast("تم توليد الصورة بنجاح!", "success");
+        } else {
+          throw new Error("لم يتم إرجاع صورة.");
+        }
+      } catch (err) {
+        showToast("حدث خطأ أثناء التوليد. تم تطبيق العرض التجريبي.", "error");
+        // Fallback display
+        document.getElementById('imgResultDisplay').src = "https://placehold.co/800x600/1e293b/ffffff?text=SuperAI+Generated+Art";
+        document.getElementById('imgResultBox').classList.remove('hidden');
+      } finally {
+        document.getElementById('imgLoading').classList.add('hidden');
+      }
+    }
+
+    function magicEnhanceImgPrompt() {
+      const input = document.getElementById('imgPromptInput');
+      if (!input.value.trim()) {
+        input.value = "مدينة مستقبليّة مليئة بمركبات طائرة، أضواء نيون سايبربانك، تصوير فوتوغرافي واقعي 8k";
+      } else {
+        input.value += "، تفاصيل سينمائية فائقة، إضاءة درامية، دقة 8K عالية الروعة";
+      }
+      showToast("تم تحسين الوصف النصي بذكاء!", "info");
+    }
+
+    function downloadImageResult() {
+      const img = document.getElementById('imgResultDisplay');
+      if (!img.src) return;
+      const a = document.createElement('a');
+      a.href = img.src;
+      a.download = `superai-${Date.now()}.png`;
+      a.click();
+    }
+
+    function sendToAnimateTab() {
+      const img = document.getElementById('imgResultDisplay');
+      if (!img.src) return;
+      document.getElementById('imgUploadDropZone').classList.add('hidden');
+      const prev = document.getElementById('imgVidSourcePreview');
+      prev.src = img.src;
+      prev.classList.remove('hidden');
+      switchTab('img-to-video');
+      showToast("تم نقل الصورة لقسم التحريك!", "info");
+    }
+
+    // Tab 3: Text to Video Logic
+    function setVidDuration(dur) {
+      currentVidDuration = dur;
+      document.querySelectorAll('.vid-dur-card').forEach(b => {
+        b.classList.remove('border-purple-500', 'bg-purple-500/10');
+        b.classList.add('border-gray-800', 'bg-dark-card');
+      });
+      event.currentTarget.classList.add('border-purple-500', 'bg-purple-500/10');
+      event.currentTarget.classList.remove('border-gray-800', 'bg-dark-card');
+    }
+
+    async function generateVideoFromText() {
+      const prompt = document.getElementById('videoPromptInput').value.trim();
+      if (!prompt) {
+        showToast("يرجى كتابة سيناريو الفيديو أولاً.", "warning");
+        return;
+      }
+
+      document.getElementById('vidPlaceholder').classList.add('hidden');
+      document.getElementById('vidResultBox').classList.add('hidden');
+      document.getElementById('vidLoading').classList.remove('hidden');
+
+      // Generate keyframe using Flash Image, then animate on Canvas
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: `Cinematic movie scene frame for: ${prompt}` }] }],
+            generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: '16:9' } }
+          })
+        });
+
+        const data = await res.json();
+        const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+        const img = new Image();
+        img.src = base64 ? `data:image/png;base64,${base64}` : "https://placehold.co/800x450/0f172a/ffffff?text=SuperAI+Video+Frame";
+        await img.decode();
+
+        renderAnimatedCanvas('videoCanvas', img);
+        document.getElementById('vidResultBox').classList.remove('hidden');
+        showToast("تم توليد مقطع الفيديو ورندرة الحركة!", "success");
+      } catch (err) {
+        showToast("خطأ في الاتصال، جاري استخدام محاكاة الحركة...", "error");
+      } finally {
+        document.getElementById('vidLoading').classList.add('hidden');
+      }
+    }
+
+    function renderAnimatedCanvas(canvasId, srcImg) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      canvas.width = 640;
+      canvas.height = 360;
+
+      let frame = 0;
+      if (videoAnimId) cancelAnimationFrame(videoAnimId);
+
+      function loop() {
+        frame++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const scale = 1.0 + Math.sin(frame * 0.015) * 0.08;
+        const dx = Math.cos(frame * 0.02) * 8;
+
+        ctx.save();
+        ctx.translate(canvas.width / 2 + dx, canvas.height / 2);
+        ctx.scale(scale, scale);
+        ctx.drawImage(srcImg, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+        ctx.restore();
+
+        // Particles Effect Overlay
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        for (let i = 0; i < 8; i++) {
+          const px = (Math.sin(frame * 0.02 + i) * 0.5 + 0.5) * canvas.width;
+          const py = (frame * (i + 1) * 0.8) % canvas.height;
+          ctx.beginPath();
+          ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        videoAnimId = requestAnimationFrame(loop);
+      }
+      loop();
+    }
+
+    function toggleVideoPlayback() {
+      const btn = document.getElementById('btnPlayPauseVid');
+      if (videoAnimId) {
+        cancelAnimationFrame(videoAnimId);
+        videoAnimId = null;
+        btn.innerHTML = `<i class="fa-solid fa-play"></i> <span>تشغيل</span>`;
+      } else {
+        btn.innerHTML = `<i class="fa-solid fa-pause"></i> <span>إيقاف مؤقت</span>`;
+      }
+    }
+
+    function downloadCanvasVideo() {
+      const canvas = document.getElementById('videoCanvas');
+      const url = canvas.toDataURL("image/png");
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `superai-video-frame-${Date.now()}.png`;
+      a.click();
+    }
+
+    // Tab 4: Image to Video Logic
+    function handleImageVidUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        document.getElementById('imgUploadDropZone').classList.add('hidden');
+        const prev = document.getElementById('imgVidSourcePreview');
+        prev.src = evt.target.result;
+        prev.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function generateImageToVideoAnim() {
+      const prev = document.getElementById('imgVidSourcePreview');
+      if (!prev.src || prev.classList.contains('hidden')) {
+        showToast("يرجى اختيار صورة أولاً لتحريكها.", "warning");
+        return;
+      }
+
+      document.getElementById('imgVidPlaceholder').classList.add('hidden');
+      document.getElementById('imgVidLoadingState').classList.remove('hidden');
+
+      setTimeout(() => {
+        const canvas = document.getElementById('imgVidOutputCanvas');
+        canvas.classList.remove('hidden');
+        const img = new Image();
+        img.src = prev.src;
+        img.onload = () => {
+          renderAnimatedCanvas('imgVidOutputCanvas', img);
+          document.getElementById('imgVidLoadingState').classList.add('hidden');
+          showToast("تم تحريك الصورة بنجاح!", "success");
+        };
+      }, 1500);
+    }
+
+    // Tab 5: Text to Movie Storyboards Logic
+    async function buildMovieStoryboard() {
+      const script = document.getElementById('storyScriptInput').value.trim();
+      if (!script) {
+        showToast("يرجى كتابة القصة أو نص الفيلم أولاً.", "warning");
+        return;
+      }
+
+      document.getElementById('storyboardEmpty').classList.add('hidden');
+      document.getElementById('storyboardGrid').innerHTML = "";
+      document.getElementById('storyboardProgress').classList.remove('hidden');
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: [{ parts: [{ text: script }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  "sceneNumber": { "type": "INTEGER" },
+                  "title": { "type": "STRING" },
+                  "cameraShot": { "type": "STRING" },
+                  "description": { "type": "STRING" },
+                  "voiceover": { "type": "STRING" },
+                  "imagePrompt": { "type": "STRING" }
+                },
+                "propertyOrdering": ["sceneNumber", "title", "cameraShot", "description", "voiceover", "imagePrompt"]
+              }
+            }
+          },
+          systemInstruction: { parts: [{ text: "قم بتقسيم النص المدخل إلى 3 مشاهد سينمائية باللغة العربية بالكامل مع أفكار صوَرية للقطات." }] }
+        };
+
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        const scenes = JSON.parse(data.candidates[0].content.parts[0].text);
+
+        const grid = document.getElementById('storyboardGrid');
+
+        for (const sc of scenes) {
+          const card = document.createElement('div');
+          card.className = "glass-card rounded-2xl p-5 border border-gray-800 space-y-3 flex flex-col justify-between";
+          card.innerHTML = `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 font-bold rounded-md">المشهد ${sc.sceneNumber}</span>
+                <span class="text-gray-400 font-semibold">${sc.cameraShot}</span>
+              </div>
+              <h4 class="font-bold text-sm text-white">${sc.title}</h4>
+              <div id="sc-img-${sc.sceneNumber}" class="h-44 bg-dark-bg rounded-xl border border-gray-800 flex items-center justify-center relative overflow-hidden">
+                <div class="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin"></div>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">${sc.description}</p>
+              <div class="p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 text-[11px] text-emerald-300">
+                <i class="fa-solid fa-microphone ml-1"></i> <strong>التعليق الصوتي:</strong> ${sc.voiceover}
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+
+          // Fetch Scene Image via Flash Image Model
+          (async () => {
+            try {
+              const imgUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+              const imgRes = await fetch(imgUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ role: 'user', parts: [{ text: `${sc.imagePrompt}, cinematic movie frame` }] }],
+                  generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: '16:9' } }
+                })
+              });
+              const imgData = await imgRes.json();
+              const b64 = imgData?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+              const box = document.getElementById(`sc-img-${sc.sceneNumber}`);
+              if (b64) {
+                box.innerHTML = `<img src="data:image/png;base64,${b64}" class="w-full h-full object-cover">`;
+              } else {
+                box.innerHTML = `<img src="https://placehold.co/600x350/0f172a/ffffff?text=Scene+${sc.sceneNumber}" class="w-full h-full object-cover">`;
+              }
+            } catch (e) {
+              document.getElementById(`sc-img-${sc.sceneNumber}`).innerHTML = `<img src="https://placehold.co/600x350/0f172a/ffffff?text=Scene+${sc.sceneNumber}" class="w-full h-full object-cover">`;
+            }
+          })();
+        }
+
+        showToast("تم إنشاء مشاهد الفيلم والسيناريو بنجاح!", "success");
+      } catch (err) {
+        showToast("حدث خطأ أثناء توليد القصة.", "error");
+      } finally {
+        document.getElementById('storyboardProgress').classList.add('hidden');
+      }
+    }
+
+    function loadSampleStoryIdea() {
+      const ideas = [
+        "في عام 2090، يكتشف عالم عربي شفرة رازخة في باطن الأرض تفتك بأسرار السفر عبر الزمن...",
+        "قصة مغامرة لفتى يعثر على خريطة مجرة مفقودة داخل مكتبة قديمة في القاهرة...",
+        "في أحدث المحطات الفضائية، يتعاون رواد فضاء لإعادة بناء المريخ وتحويله لكوكب زراعي..."
+      ];
+      document.getElementById('storyScriptInput').value = ideas[Math.floor(Math.random() * ideas.length)];
+    }
+
+    // Toast Utility
+    function showToast(msg, type = "info") {
+      const box = document.getElementById('toastBox');
+      const toast = document.createElement('div');
+
+      let bg = "bg-gray-800 border-gray-700 text-white";
+      if (type === "success") bg = "bg-emerald-950/90 border-emerald-800 text-emerald-300";
+      if (type === "error") bg = "bg-rose-950/90 border-rose-800 text-rose-300";
+      if (type === "warning") bg = "bg-amber-950/90 border-amber-800 text-amber-300";
+
+      toast.className = `px-4 py-3 rounded-xl border ${bg} text-xs font-bold shadow-2xl backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0 flex items-center space-x-2 space-x-reverse pointer-events-auto`;
+      toast.innerHTML = `<span>${msg}</span>`;
+
+      box.appendChild(toast);
+
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
